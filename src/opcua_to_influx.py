@@ -27,7 +27,7 @@ class DataCollection:
         self.influx_host = "http://localhost:8086"
         # influx_host = "10.80.10.1"  # Company InfluxDB server
         self.token = "UDb3euK28xX5A027jQStLnv4yJ9Hmsbx43TpCUUftiHsfV6EY4Q2RNJu1u600Ldi-R1jWcVOsluzoU8yVVGBoQ=="
-        self.org = "jannen" # Replace with company or organization name
+        self.org = "jannen" # We should replace this with real organization name
         # bucket = "plc_data" 
         self.bucket = "machine_status"
 
