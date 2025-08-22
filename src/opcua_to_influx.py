@@ -64,7 +64,7 @@ class DataCollection:
 
         try:
             while True:
-                json_body = []
+                data_points = []
                 # Read values from the specified nodes
                 for node_id in self.node_ids:
                     node = opc_client.get_node(node_id)
@@ -75,7 +75,7 @@ class DataCollection:
                         print(f"Warning: Node {node_id} returned None")
                         continue
 
-                    json_body.append({
+                    data_points.append({
                         "measurement": "machine_status",
                         "tags": {
                             "node_id": node_id
@@ -85,18 +85,24 @@ class DataCollection:
                         }
                     })
 
-                    # Write to InfluxDB            
-                    point = Point("machine_status").tag("node_id", node_id) \
-                        .field("value", int(value) if isinstance(value, bool) else float(value)) \
-                        .time(time.time_ns(), WritePrecision.NS)
-                    write_api.write(bucket=self.bucket, org=self.org, record=point)
+                if not data_points:
+                    print("No data to write to InfluxDB, skipping this iteration.")
+                    continue
 
-                print("Data written to InfluxDB")
 
+                # Write all points in one batch
+                write_api.write(bucket=self.bucket, org=self.org, record=data_points, write_precision=WritePrecision.NS)
+
+                print("Batch data written to InfluxDB")
+                # print("Data written to InfluxDB")
                 # Wait before next read
                 print("Waiting for 1 second before next read...")
                 time.sleep(1)
 
+        except KeyboardInterrupt:
+            print("\nManual shutdown requested. Cleaning up...")
+            
+        
         finally:
             opc_client.disconnect()
             influx_client.close()
