@@ -8,6 +8,18 @@ from opcua import Client
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 import requests
+import logging
+
+# Configure logging
+# logging.basicConfig(
+#     level=logging.INFO,  # Set to DEBUG for more detailed logs
+#     format='%(asctime)s - %(levelname)s - %(message)s',
+#     handlers=[
+#         logging.FileHandler("data_collector.log"),
+#         logging.StreamHandler()
+#     ]
+# )
+
 
 class DataCollection:
     def __init__(self):
@@ -39,12 +51,15 @@ class DataCollection:
             opc_client.connect()
             if opc_client.is_connected():
                 print("Connected to OPC-UA Server")
+                # logging.info("Connected to OPC-UA Server")
             else:
                 print("OPC-UA Server connection failed.")
+                # logging.info("OPC-UA Server connection failed.")
 
         # Exit the run method gracefully
         except Exception as e:
             print(f"Error connecting to OPC-UA Server: {e}")
+            # logging.error(f"Error connecting to OPC-UA Server: {e}")
 
 
         # Connect to InfluxDB
@@ -55,10 +70,17 @@ class DataCollection:
             if health.ok and health.json().get("status") == "pass":
                 write_api = influx_client.write_api(write_options=SYNCHRONOUS)
                 print("Connected to InfluxDB and health check passed.")
+                # logging.info("Connected to InfluxDB and health check passed.")
+
             else:
                 print("InfluxDB health check failed.")
+                # logging.info("InfluxDB health check failed.")
+                # logging.warning("InfluxDB health check failed.")
+
         except Exception as e:
             print(f"Failed to connect to InfluxDB: {e}")
+            # logging.error(f"Failed to connect to InfluxDB: {e}")
+
             return
 
 
@@ -70,9 +92,12 @@ class DataCollection:
                     node = opc_client.get_node(node_id)
                     value = node.get_value()
                     print(f"Read {node_id}: {value}")
+                    # logging.debug(f"Read {node_id}: {value}")
 
                     if value is None:
                         print(f"Warning: Node {node_id} returned None")
+                        # logging.warning(f"Node {node_id} returned None")
+
                         continue
 
                     data_points.append({
@@ -87,6 +112,7 @@ class DataCollection:
 
                 if not data_points:
                     print("No data to write to InfluxDB, skipping this iteration.")
+                    # logging.info("No data to write to InfluxDB, skipping this iteration.")
                     continue
 
 
@@ -94,21 +120,26 @@ class DataCollection:
                 write_api.write(bucket=self.bucket, org=self.org, record=data_points, write_precision=WritePrecision.NS)
 
                 print("Batch data written to InfluxDB")
-                # print("Data written to InfluxDB")
+                # logging.info("Batch data written to InfluxDB")
+
                 # Wait before next read
                 print("Waiting for 1 second before next read...")
+                # logging.info("Waiting for 1 second before next read...")
                 time.sleep(1)
 
         except KeyboardInterrupt:
-            print("\nManual shutdown requested. Cleaning up...")
+            print("\n Manual shutdown requested. Cleaning up...")
+            # logging.info("Manual shutdown requested. Cleaning up...")
             
         
         finally:
             opc_client.disconnect()
             influx_client.close()
             print("Disconnected from OPC-UA Server and InfluxDB")
+            # logging.info("Disconnected from OPC-UA Server and InfluxDB")
             print("Data collection completed.")
             print("Exiting...")
+            # logging.info("Data collection completed. Exiting...")
 
 def main(args=None):
     data_collector = DataCollection()
