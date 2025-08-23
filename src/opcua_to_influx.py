@@ -11,14 +11,14 @@ import requests
 import logging
 
 # Configure logging
-# logging.basicConfig(
-#     level=logging.INFO,  # Set to DEBUG for more detailed logs
-#     format='%(asctime)s - %(levelname)s - %(message)s',
-#     handlers=[
-#         logging.FileHandler("data_collector.log"),
-#         logging.StreamHandler()
-#     ]
-# )
+logging.basicConfig(
+    level=logging.INFO,  # Set to DEBUG for more detailed logs
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("data_collector.log"),
+        logging.StreamHandler()
+    ]
+)
 
 
 class DataCollection:
@@ -154,3 +154,4 @@ if __name__ == "__main__":
 # It is designed to run continuously, reading data every second and writing it to the database.
 # Make sure to replace the OPC-UA server URL and InfluxDB configuration with your actual settings.
 # The script handles connection and disconnection gracefully, ensuring resources are cleaned up on exit.
+# Uncomment logging configuration at at each line after print and comment print statements to enable logging to file.

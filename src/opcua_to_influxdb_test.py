@@ -1,8 +1,7 @@
 from opcua import Client
 from influxdb import InfluxDBClient
 import time
-
-# OPC-UA server URL --> replace with your PLC's address
+# OPC-UA server URL
 opcua_url = "opc.tcp://192.168.1.100:4840" 
 
 # InfluxDB configuration
@@ -12,7 +11,7 @@ influx_user = "admin"
 influx_password = "password"
 influx_dbname = "plc_data"
 
-# Node ID to read from the PLC (replace with actual node ID)
+# Node ID to read from the PLC
 node_id = "ns=2;s=TemperatureSensor1"
 
 # Connect to OPC-UA server
